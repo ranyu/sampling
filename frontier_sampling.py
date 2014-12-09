@@ -18,7 +18,7 @@ class MDRandomWalk(Algorithm):
                 g.add_edge(start_id,index)
 
 
-    def run(self,k,m = 10):
+    def run(self,k,m = 5):
         degree_sum = 0
         node_set = sample(self.sampled_graph.vs['name'],m)
         for sv in node_set:
@@ -38,6 +38,9 @@ class MDRandomWalk(Algorithm):
                         start_node = node_set[j]
                         break
             query_result = self.egraph.query_node(start_node,n_attribute)
+            for nd in query_result:
+                if nd['name'] in self.sampled_graph.vs['name']:
+                    self.update_graph(start_node,nd)
             new_node = choice(query_result)
             self.update_graph(start_node,new_node)
             i += 1

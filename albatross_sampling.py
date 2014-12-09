@@ -25,6 +25,9 @@ class AlbatrossSampling(Algorithm):
 
         while i < k:
             query_result = self.egraph.query_node(start_node,n_attribute)
+            for nd in query_result:
+                if nd['name'] in self.sampled_graph.vs['name']:
+                    self.update_graph(start_node,nd)
             new_node = choice(query_result)
             self.update_graph(start_node,new_node)
             if random() < p_jump:
