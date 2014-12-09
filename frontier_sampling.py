@@ -18,30 +18,37 @@ class MDRandomWalk(Algorithm):
                 g.add_edge(start_id,index)
 
 
-    def run(self,k,m = 5):
+    def run(self,k,m = 10):
         degree_sum = 0
+        flag = True
         node_set = sample(self.sampled_graph.vs['name'],m)
         for sv in node_set:
             degree_sum += self.sampled_graph.degree(sv)
-
         n_attribute = len(self.sampled_graph.vertex_attributes())-2
         i = 0
 
         while i < k:
+            ra = random()
+            flag = True
+            de_sum = 0
             for j in xrange(len(node_set)):
-                if j == len(node_set)- 1:
+                if j == len(node_set) - 1:
                     start_node = node_set[-1]
+                elif ra >= float(de_sum) /degree_sum and ra < de_sum + float(self.sampled_graph.degree(str(node_set[j])))/degree_sum:
+                    start_node = node_set[j]
                     break
-                else:
-                    ra = random()
-                    if ra >= self.sampled_graph.degree(str(node_set[j]))/degree_sum and ra < self.sampled_graph.degree(str(node_set[j+1]))/degree_sum:
-                        start_node = node_set[j]
-                        break
+                de_sum += float(self.sampled_graph.degree(str(node_set[j])))/degree_sum
             query_result = self.egraph.query_node(start_node,n_attribute)
             for nd in query_result:
                 if nd['name'] in self.sampled_graph.vs['name']:
                     self.update_graph(start_node,nd)
             new_node = choice(query_result)
+            while flag:
+                if new_node['name'] not in node_set:
+                    node_set[j] = new_node['name']
+                    flag = False
+                    break
+                new_node = choice(query_result)           
             self.update_graph(start_node,new_node)
             i += 1
 
