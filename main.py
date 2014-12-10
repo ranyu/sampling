@@ -10,7 +10,7 @@ from multiple_independent_random_walk import MIRandomWalk
 
 from egraphs import FBEgoGraph, RemoteGraph
 
-fb_graph = RemoteGraph('data/public.txt')
+fb_graph = FBEgoGraph('data/public.txt')
 
 fuck_fsa_random = FirstSearchAlgorithm(fb_graph, 'random_first')
 fuck_fsa_breadth = FirstSearchAlgorithm(fb_graph, 'breadth_first')
@@ -28,6 +28,6 @@ fuck_mir = MIRandomWalk(fb_graph)
 a = [fuck_rj, fuck_ff, fuck_sbs, fuck_fsa_width, fuck_fsa_random, fuck_fsa_breadth,
      fuck_ta, fuck_rw, fuck_abs, fuck_md, fuck_mhr, fuck_mir]
 
-for method in a[:]:
-    print method.__class__.__name__, method.validate()
+for method in a[-1:]:
+    print method.__class__.__name__, method.validate(k =1)
     print method.sampled_graph.summary()
