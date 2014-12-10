@@ -11,12 +11,12 @@ DEG_PATH_PARSE = 'answer/%s/degree.txt'
 def write_answer_into_mongo(graph_name):
     collection = db[graph_name]
     #collection.drop()
-    graph = Graph.Read_Ncol('data/'+graph_name+'.txt', directed=False)
+    '''graph = Graph.Read_Ncol('data/'+graph_name+'.txt', directed=False)
     graph = graph.simplify()
     degree_dict = {}
 
     for v in graph.vs:
-        degree_dict[v['name']] = v.degree()
+        degree_dict[v['name']] = v.degree()'''
 
     '''with open(CLO_PATH_PARSE % graph_name) as clo:
         for line_id, line in enumerate(clo.readlines()):
