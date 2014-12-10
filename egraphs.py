@@ -1,8 +1,11 @@
+from pymongo import MongoClient
 from igraph import Graph
 
 from seed import generate_seed_graph
 from query import query_seed
 
+mc = MongoClient()
+db = mc.test
 
 class EGraph(object):
 
@@ -31,7 +34,13 @@ class FBEgoGraph(EGraph):
 
     def query_node(self, node_name, n_attribute):
         node = self.origin_graph.vs.find(name=node_name)
-        result = [{'name': n['name'], 'degree': n.degree()} for n in node.neighbors()]
+        collection = db['public']
+        for n in node.neighbors():
+            c = collection.find_one({'node_id': n['name']})
+            print c
+            result = [{'name': c['node_id'], 'degree': c['degree'],'attibute_1':c['attibute_1'],'attibute_2':c['attibute_2'],'attibute_3':c['attibute_3'],'attibute_4':c['attibute_4'],'attibute_5':c['attibute_5']}]
+        print result
+        quit()
         return result
 
     @property

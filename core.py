@@ -10,6 +10,7 @@ class Algorithm(object):
     egraph = None
     name = None
     degree_dis = None
+    attr_dis = None
     top_k = 100
     top_k_closeness = None
 
@@ -24,21 +25,27 @@ class Algorithm(object):
         raise NotImplementedError
 
     def _validate(self):
-        close_validate, kl = validate_sampling(self)
-        return close_validate, kl
+        close_validate, kl , kl_attr = validate_sampling(self)
+        return close_validate, kl ,kl_attr
 
     def validate(self, k=300):
         self.run(k)
         #if self.sampled_graph.vcount() == self.egraph.seed_graph.vcount():
         #    raise AlgorithmNoResultError
         self.cal_sample_degree_dist()
+        self.cal_sample_attr_dist()
         self.cal_clossness_rank()
-        close_validate, kl = self._validate()
-        return close_validate, kl
+        self.cal_degree_dist()
+        self.cal_attr_dist()
+        close_validate, kl , kl_attr= self._validate()
+        return close_validate, kl ,kl_attr
 
     def cal_sample_degree_dist(self):
         sampled_degree = [int(v['degree']) for v in self.sampled_graph.vs]
         self.degree_dis = self.cal_degree_dist(sampled_degree)
+    def cal_sample_attr_dist(self):
+        sampled_attr = [int(v['attibute_1']) for v in self.sampled_graph.vs]
+        self.attr_dis = self.cal_attr_dist(sampled_attr)
 
     def cal_degree_dist(self, degree):
         degree_counter = Counter(degree)
@@ -67,6 +74,35 @@ class Algorithm(object):
                 normalize_bin_counter[i[0]] = 0.000006
         assert sum(normalize_bin_counter.values()) < 1.0001
         return [(key, normalize_bin_counter[key]) for key in degree_bin]
+
+    def cal_attr_dist(self, attr):
+        degree_counter = Counter(attr)
+
+        degree_bin = [(1, 1), (2, 2), (3, 3), (4, 6), (7, 10), (11, 15),
+                      (16, 21), (22, 28), (29, 36), (37, 45), (46, 55),
+                      (56, 70), (71, 100), (101, 200), (201,)]
+
+        degree_bin_counter = {}
+        for _bin in degree_bin:
+            if len(_bin) == 2:
+                bin_counter = sum([degree_counter[key]
+                                for key in degree_counter.keys()
+                                if key in range(_bin[0], _bin[1]+1)])
+            else:
+                bin_counter = sum([degree_counter[key]
+                                for key in degree_counter.keys()
+                                if key >= _bin[0]])
+            degree_bin_counter[_bin] = bin_counter
+        bin_counter_sum = sum(degree_bin_counter.values())
+        normalize_bin_counter = {i[0]: float(i[1]) / bin_counter_sum
+                                 for i in degree_bin_counter.items()}
+
+        for i in normalize_bin_counter.items():
+            if i[1] == 0:
+                normalize_bin_counter[i[0]] = 0.000006
+        assert sum(normalize_bin_counter.values()) < 1.0001
+        return [(key, normalize_bin_counter[key]) for key in degree_bin]
+
 
     def cal_clossness_rank(self):
         rank_clossness = []

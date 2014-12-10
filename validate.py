@@ -20,6 +20,11 @@ def fetch_origin_degs_list(collection):
         degs.append(int(node['degree']))
     return degs
 
+def fetch_origin_attrs_list(collection):
+    attr1 = []
+    for node in collection.find():
+        attr1.append(int(node['attibute_1']))
+    return attr1
 
 def validate_degree(algorithm):
     collection = db[algorithm.egraph.name]
@@ -31,6 +36,15 @@ def validate_degree(algorithm):
     so = valide_dis(sampled_prob, origin_prob)
     return 0.5 * (os + so)
 
+def validate_attribute(algorithm):
+    collection = db[algorithm.egraph.name]
+    origin_attr_dist = algorithm.cal_attr_dist(fetch_origin_attrs_list(collection))
+    sampled_attr_dist = algorithm.attr_dis
+    origin_prob = [i[1] for i in origin_attr_dist]
+    sampled_prob = [i[1] for i in sampled_attr_dist]
+    os = valide_dis(origin_prob, sampled_prob)
+    so = valide_dis(sampled_prob, origin_prob)
+    return 0.5 * (os + so)
 
 def validate_closeness(algorithm):
     collection = db[algorithm.egraph.name]
@@ -46,4 +60,5 @@ def validate_closeness(algorithm):
 def validate_sampling(algorithm):
     close_validate = validate_closeness(algorithm)
     kl = validate_degree(algorithm)
-    return close_validate, kl
+    kl_attr = validate_attribute(algorithm)
+    return close_validate, kl, kl_attr
